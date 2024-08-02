@@ -2,8 +2,6 @@ package com.ebr.proposta_app.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name = "tb_proposta")
@@ -14,8 +12,10 @@ public class Proposta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "valor_solicitado")
     private Double valorSolicitado;
 
+    @Column(name = "prazo_pagamento")
     private Integer prazoPagamento;
 
     private Boolean aprovada;
@@ -24,7 +24,7 @@ public class Proposta {
 
     private String observacao;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
