@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PropostaService {
@@ -23,4 +25,7 @@ public class PropostaService {
         return PropostaMapper.INSTANCE.converterEntidadeParaDto(proposta);
     }
 
+    public List<PropostaDTO> obterPropostas() {
+        return PropostaMapper.INSTANCE.convertListEntityToListDto(repository.findAll());
+    }
 }
