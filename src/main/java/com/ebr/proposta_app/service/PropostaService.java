@@ -6,6 +6,7 @@ import com.ebr.proposta_app.mapper.PropostaMapper;
 import com.ebr.proposta_app.repository.PropostaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 
@@ -16,13 +17,20 @@ import java.util.List;
 public class PropostaService {
 
     private final PropostaRepository repository;
+    private final NotificacaoService notificacaoService;
+
+    @Value("${rabbitmq.propostapendente.exchange}")
+    private String exchange;
+
 
     @Transactional
     public PropostaDTO salvar(PropostaDTO dto) {
         Proposta proposta = PropostaMapper.INSTANCE.converterDtoParaProposta(dto);
         repository.save(proposta);
 
-        return PropostaMapper.INSTANCE.converterEntidadeParaDto(proposta);
+        PropostaDTO propostaDTO = PropostaMapper.INSTANCE.converterEntidadeParaDto(proposta);
+        notificacaoService.notificar(propostaDTO, exchange);
+        return propostaDTO;
     }
 
     public List<PropostaDTO> obterPropostas() {
