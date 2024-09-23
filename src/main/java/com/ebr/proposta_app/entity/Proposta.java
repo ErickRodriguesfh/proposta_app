@@ -1,5 +1,6 @@
 package com.ebr.proposta_app.entity;
 
+import com.ebr.proposta_app.enums.Situacao;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -24,8 +25,17 @@ public class Proposta {
 
     private String observacao;
 
+    @Enumerated(EnumType.STRING)
+    private Situacao situacao;
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
+
+    @PrePersist
+    public void antesSalvar() {
+        this.aprovada = false;
+        this.situacao = Situacao.EM_ANALISE;
+    }
 
 }

@@ -30,6 +30,7 @@ public interface PropostaMapper {
     @Mapping(target = "cpf", source = "usuario.cpf")
     @Mapping(target = "renda", source = "usuario.renda")
     @Mapping(target = "id", source = "usuario.id")
+    @Mapping(target = "situacao", source = "situacao")
     PropostaDTO converterEntidadeParaDto(Proposta proposta);
 
     List<PropostaDTO> convertListEntityToListDto(Iterable<Proposta> propostas);

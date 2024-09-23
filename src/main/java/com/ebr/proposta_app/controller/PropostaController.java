@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/proposta")
+@CrossOrigin("*")
 public class PropostaController {
 
     private final PropostaService propostaService;
