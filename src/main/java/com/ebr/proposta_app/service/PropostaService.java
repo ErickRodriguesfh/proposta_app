@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
 
@@ -17,23 +16,31 @@ import java.util.List;
 public class PropostaService {
 
     private final PropostaRepository repository;
-    private final NotificacaoService notificacaoService;
+    private final NotificacaoRabbitService notificacaoService;
 
     @Value("${rabbitmq.propostapendente.exchange}")
     private String exchange;
-
 
     @Transactional
     public PropostaDTO salvar(PropostaDTO dto) {
         Proposta proposta = PropostaMapper.INSTANCE.converterDtoParaProposta(dto);
         repository.save(proposta);
-
-        PropostaDTO propostaDTO = PropostaMapper.INSTANCE.converterEntidadeParaDto(proposta);
-        notificacaoService.notificar(propostaDTO, exchange);
-        return propostaDTO;
+        notificarRabbitMq(proposta);
+        notificacaoService.notificar(proposta, exchange);
+        return PropostaMapper.INSTANCE.converterEntidadeParaDto(proposta);
     }
 
     public List<PropostaDTO> obterPropostas() {
         return PropostaMapper.INSTANCE.convertListEntityToListDto(repository.findAll());
     }
+
+    public void notificarRabbitMq(Proposta proposta) {
+        try {
+            notificacaoService.notificar(proposta, exchange);
+        } catch (RuntimeException ex) {
+            proposta.setIntegrada(false);
+            repository.save(proposta);
+        }
+    }
+
 }
